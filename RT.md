@@ -257,3 +257,11 @@ if ! grep $f $file; then
     echo $f > $file; history -c  
 fi
 ~~~
+
+### Linux pager abuse
+
+When a file is opene a tool that creates multiple pages beyond the bounds of your terminal window size, it uses a pager to make pages. These can be abused to launch commands. This is especially useful if the tool used is in sudo list. 
+
+&nbsp;&nbsp;&nbsp;&nbsp;<code> 1. Using less or more or man, etc, which accept commands by giving a ! And command like !sh </code>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<code> 2. Open large file, type anything and then give it !/bin/sh or !sh etc! </code>
