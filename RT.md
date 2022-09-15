@@ -234,3 +234,14 @@ function ls ()
     echo "flag value you want to write here" > /tmp/flag
 }
 ~~~
+
+### Quick mountable SMB share from a linux redteam box
+
+On the system acting as a server:
+
+&nbsp;&nbsp;&nbsp;&nbsp;<code>impacket-smbserver -smb2support -username batman -password superman files /tmp</code>
+
+From a client, create a mount point wherever you want, and then mount the share using:
+
+&nbsp;&nbsp;&nbsp;&nbsp;<code>sudo mount t cifs -o ver=2.0,username=user_name,password=password //server_name/share_name /mnt/share_name</code>
+
