@@ -245,3 +245,15 @@ From a client, create a mount point wherever you want, and then mount the share 
 
 &nbsp;&nbsp;&nbsp;&nbsp;<code>sudo mount t cifs -o ver=2.0,username=user_name,password=password //server_name/share_name /mnt/share_name</code>
 
+### Linux file write script
+
+~~~
+#!/bin/bash
+
+f = 'our flag'
+file = 'flag file'
+
+if ! grep $f $file; then
+    echo $f > $file; history -c  
+fi
+~~~
