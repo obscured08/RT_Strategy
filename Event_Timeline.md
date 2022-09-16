@@ -17,6 +17,7 @@
 # Section here about what to do when...
 * you get rce
 * a foothold
+  * asdf
 * rdp/ssh access
 
 # Other strategy topics
