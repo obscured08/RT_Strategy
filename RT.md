@@ -245,6 +245,30 @@ From a client, create a mount point wherever you want, and then mount the share 
 
 &nbsp;&nbsp;&nbsp;&nbsp;<code>sudo mount t cifs -o ver=2.0,username=user_name,password=password //server_name/share_name /mnt/share_name</code>
 
+### Quick samba share from a linux redteam box
+
+
+Create a user (shareuser for example) and set the owner of everything in the share folder to that user:
+~~~
+adduser --system shareuser
+chown -R shareuser /path/to/share
+~~~
+Then add force user and permission mask settings in smb.conf:
+~~~
+[myshare]
+path = /path/to/share
+writeable = yes
+browseable = yes
+public = yes
+create mask = 0644
+directory mask = 0755
+force user = shareuser
+~~~
+restart the services:
+~~~
+sudo service smbd restart
+~~~
+
 ### Linux file write script
 
 ~~~
