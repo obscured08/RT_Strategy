@@ -586,4 +586,24 @@ You can then address commands as usual, just adding `procxychains` in front of i
 
 More info here along with other routing methods: https://www.offensive-security.com/metasploit-unleashed/pivoting/ and https://docs.metasploit.com/docs/using-metasploit/intermediate/pivoting-in-metasploit.html
 
+### SSH port forwarding / tunneling
 
+You can use ssh connections to tunnel and proxy commands from your attack system to your victim as well through ssh.
+
+#### Local port forwarding
+With local port forwarding through ssh you can address traffic to a local port on your host that will be forwarded to a specific port on the remote host.
+~~~
+ssh -L local_port:remote_ip:remote_port user@remote_host
+~~~
+
+With remote port forwarding, you can forward a port from a remote host (victim) to your machine. Useful for when services on that remote hose are only exposed to itself. 
+
+~~~
+ssh -R remote_port:local_host_ip:local_port user@local_host
+~~~
+
+With dynamic port forwarding, the secure tunnel supports multiple ports at remote host. 
+~~~
+ssh -d local_port user@remote_host
+~~~
+You can then access this with proxychains or by configuring a browser to use this local port. 
