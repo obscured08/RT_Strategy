@@ -557,3 +557,33 @@ then configure ufw with ips of systems you want to allow access to the console.
 Ufw enable 
 Ufw allow from <ip> to any port 5554
 ~~~
+
+### Proxy Chains
+Using proxy chains to route traffic through a compromised host. For example, you have access to a system in a DMZ and it has access to system in another zone that are not directly accessible to your external attacking systems. You can use proxychains to help route traffic from your external attack system through the compromised DMZ system to the internal target system.
+
+Create a tunnel from your attacking system to the first compromised machine:
+~~~
+ssh -D 127.0.0.1:5555
+~~~
+Configure /etc/proxychains.conf 
+~~~
+socks4 127.0.0.1 5555
+~~~
+You can then address commands as usual, just adding `procxychains` in front of it like `proxychains curl .....`
+
+#### With metasploit
+You can also metasploit sessions to setup routes for proxychain use.
+Background your current meterpeter session with `background`
+load the following module `use post/multi/manage/autoroute`
+set the session veriable with the session you wish to route through `set SESSION 1` (if you need to look up your session numbers just type `sessions` at the msf console
+setup the subnet for the victim where any traffic from metasploit to an address in that subnet will be routed through that particular session `set SUBNET 10.0.0.0/24`
+verify the setup with `route print`
+Load another module for socks_proxy with `use auxiliary/server/socks_proxy` and set the version with `set VERSION 4a`
+Then `run`
+Configure /etc/proxychains.conf (port 1080 is msf default) `socks4 127.0.0.1 1080`
+
+You can then address commands as usual, just adding `procxychains` in front of it like `proxychains curl .....` or `proxychains firefox` to browse or `proxychains ssh user@host` and so on
+
+More info here along with other routing methods: https://www.offensive-security.com/metasploit-unleashed/pivoting/ and https://docs.metasploit.com/docs/using-metasploit/intermediate/pivoting-in-metasploit.html
+
+
