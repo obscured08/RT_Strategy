@@ -264,6 +264,17 @@ create mask = 0644
 directory mask = 0755
 force user = shareuser
 ~~~
+
+modify ufw:
+~~~
+# ufw rules for SMB
+Ufw enable 
+Ufw allow from <ip> to any port 137
+Ufw allow from <ip> to any port 138
+Ufw allow from <ip> to any port 139
+Ufw allow from <ip> to any port 445
+~~~
+
 restart the services:
 ~~~
 sudo service smbd restart
