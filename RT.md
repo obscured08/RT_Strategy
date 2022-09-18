@@ -165,6 +165,8 @@ You can cache creds through runas on windows systems which will allow anyone to 
 
 &nbsp;&nbsp;&nbsp;&nbsp;<code>findstr /si password *.xml *.ini *.txt</code>
 
+&nbsp;&nbsp;&nbsp;&nbsp;<code>findstr /spin "password" *.*</code>
+
 ### Other useful windows files to check
 
 &nbsp;&nbsp;&nbsp;&nbsp;<code>c:\sysprep.inf</code>
@@ -188,7 +190,25 @@ You can cache creds through runas on windows systems which will allow anyone to 
 &nbsp;&nbsp;&nbsp;&nbsp;<code>Drives\Drives.xml: Element-Specific Attributes</code>
  
 &nbsp;&nbsp;&nbsp;&nbsp;<code>DataSources\DataSources.xml: Element-Specific Attributes</code>
- 
+
+~~~
+VNC
+reg query "HKCU\Software\ORL\WinVNC3\Password"
+
+Windows autologin
+reg query "HKLM\SOFTWARE\Microsoft\Windows NT\Currentversion\Winlogon"
+
+SNMP Paramters
+reg query "HKLM\SYSTEM\Current\ControlSet\Services\SNMP"
+
+Putty
+reg query "HKCU\Software\SimonTatham\PuTTY\Sessions"
+
+Search for password in registry
+reg query HKLM /f password /t REG_SZ /s
+reg query HKCU /f password /t REG_SZ /s
+~~~
+
 ### Elevated software install
  
 If the following registry keys contain "AlwaysInstallElevated" value 0x1, then any MSI run will run as admin. For exmaple: 
