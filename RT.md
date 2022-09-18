@@ -247,7 +247,6 @@ From a client, create a mount point wherever you want, and then mount the share 
 
 ### Quick samba share from a linux redteam box
 
-
 Create a user (shareuser for example) and set the owner of everything in the share folder to that user:
 ~~~
 adduser --system shareuser
@@ -257,6 +256,7 @@ Then add force user and permission mask settings in smb.conf:
 ~~~
 [myshare]
 path = /path/to/share
+read only = no
 writeable = yes
 browseable = yes
 public = yes
