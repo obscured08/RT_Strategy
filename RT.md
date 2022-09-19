@@ -668,3 +668,43 @@ With dynamic port forwarding, the secure tunnel supports multiple ports at remot
 ssh -d local_port user@remote_host
 ~~~
 You can then access this with proxychains or by configuring a browser to use this local port. 
+
+### Useful NMAP command examples
+~~~
+Quick all ports scan
+nmap -p- --min-rate=1000 -oA nmap/allports [target] 
+
+Vuln scan. Recommend defining ports for this scan
+nmap -Pn –script vuln [target]
+
+Basic scan that runs all safe scrips and checks versions, outputs all formats:
+nmap -sC -sV -oA nmap/initial [target]
+
+single target, checks all ports, feeds script and version scan
+nmap -p$(nmap -p- --min-rate=1000 [target] | grep ^[0-9] | cut -d '/' -f 1| tr '\n' ',' | sed s/,$//) -sC -sV -oA nmap/initial [target]
+
+WordPress brute force attack:
+nmap -sV --script http-wordpress-brute --script-args 'userdb=users.txt,passdb=passwds.txt,http-wordpress-brute.hostname=domain.com, http-wordpress-brute.threads=3,brute.firstonly=true' [target]
+
+Brute force attack against MS-SQL:
+nmap -p 1433 --script ms-sql-brute --script-args userdb=customuser.txt,passdb=custompass.txt [target]
+
+FTP brute force attack:
+nmap --script ftp-brute -p 21 [target]
+
+common malware scan
+nmap -sV --script=http-malware-host [target]
+
+syn scan
+nmap -sS [target]
+
+aggressive services scan	
+nmap -sV –version-intensity 4 [target]
+
+
+HTTP headers of web services
+nmap –script=http-title [target]
+
+Find web apps from specific paths	
+nmap –script=http-enum [target]
+~~~
