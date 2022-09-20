@@ -708,3 +708,70 @@ nmap –script=http-title [target]
 Find web apps from specific paths	
 nmap –script=http-enum [target]
 ~~~
+
+### DNS recon
+Get list of name servers of a domain:
+~~~
+host -t ns domain
+~~~
+Simple reverse dns lookup if PTR record is set:
+~~~
+host IP
+~~~
+zone transfers:
+~~~
+dig axfr domain @ipAddress
+host -l ns1.domain
+~~~
+
+### Web Apps
+Nikto (Discover potentially known vulns on the target site)
+~~~
+nikto -h http(s)://domain.org
+~~~
+
+Brute force directories:
+~~~
+gobuster dir -u http(s)://domain.org/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+~~~
+
+### LDAP Enumeration
+#### Nmap scripts
+
+A nmap Version scan may reveal some information under normal LDAP port 389
+~~~
+nmap --script=ldap* -p 389 ipAddress
+~~~
+
+#### Ldapsearch
+
+If LDAP Server accepts anonymous authentication, you can possibly search without binding an LDAP connection to an administrative account
+
+##### Query to find the domain base:
+
+Using simple auth (-x), target host (-H ldap://…), scope (-s) set to base naming contexts:
+
+No Creds (Anonymous)
+~~~
+ldapsearch -x -H ldap://ipaddress -s base namingcontexts
+~~~
+With Creds (binding with Administrative account)
+~~~
+ldapsearch -x -H ldap://ipaddress -D ‘domain\user’ -w ‘password’ -s base namingcontexts
+~~~
+NOTE: pay particular attention to ‘no’ backslash at the end of ldap address and the -D value must have backslash in it, in addition in the example domain: return.local, try return.local\user OR return\user
+
+
+##### Query to get information about domain:
+
+Using simple auth (-x), target host (-H ldap://…), base (-b) set to domain controller
+
+No Creds (Anonymous)
+~~~
+ldapsearch -x -H ldap://ipaddress -b base ‘dc=return,dc=local’
+~~~
+With Creds (binding with Administrative account)
+~~~
+ldapsearch -x -H ldap://ipaddress -D ‘domain\user’ -w ‘password’ -b base ‘dc=return,dc=local’
+~~~
+NOTE: pay particular attention to ‘no’ backslash at the end of ldap address, anr the -D value must have backslash in it, in addition in the example domain: return.local, try return.local\user OR return\user
