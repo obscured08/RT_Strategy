@@ -778,6 +778,8 @@ NOTE: pay particular attention to ‘no’ backslash at the end of ldap address,
 
 ### Password Cracking
 #### Hashcat
+Hashcat uses GPUs to crack passwords quickly, typically faster than John the Ripper. Only run this if you have direct access to the GPU (as in not from a VM). You can print all available hash types with `hashcat --help`
+
 
 |Hash Mode | Hash name | Notes | Example |
 |----------|---------|----------|----------|
@@ -785,9 +787,10 @@ NOTE: pay particular attention to ‘no’ backslash at the end of ldap address,
 |1000| NTLM | SAM and SYSTEM dump file hash format|hashcat -m 1000 --force a9fdfa038c4b75ebc76dc855dd74f0da /usr/share/wordlists/rockyou.txt|
 | 5600 | NetNTLMv2 | example: hash collected from responder or smb login |hashcat --force -a 0 -m 5600 SMBv2-NTLMv2-SSP-10.10.10.125.txt /usr/share/wordlists/rockyou.txt |
 |1800|sha512crypt `$6$`, SHA512 (Unix) 2|common linux shadow file. the hash will start with `$6$`| hashcat -m 1800 -a 0 -o password.txt hash rockyou.txt|
+|500|md5crypt, MD5 (Unix), Cisco-IOS `$1$` (MD5) 2| common linux shadow file hash type that starts with `$1$`|hashcat -m 500 hash.txt rockyou.txt|
 
 #### John the Ripper
-John will often guess the hash format, but you can also supply it if needed
+John will often guess the hash format (which can be useful in figuring out which hashcat mode to use too), but you can also supply it if needed
 Examples:
 ~~~
 john -format=md5crypt-long --wordlist=rockyou.txt hash.txt
@@ -795,6 +798,6 @@ john -w=rockyou.txt hash.txt
 ~~~
 John can crack linux shadow passwords after it has been unshadowed:
 ~~~
- unshadow passwd.txt shadow.txt
+ unshadow passwd.txt shadow.txt >unshadowed_pws.txt
  john -w=rockyou.txt unshadowed_pws.txt
  ~~~
