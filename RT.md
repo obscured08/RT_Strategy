@@ -775,3 +775,26 @@ With Creds (binding with Administrative account)
 ldapsearch -x -H ldap://ipaddress -D ‘domain\user’ -w ‘password’ -b base ‘dc=return,dc=local’
 ~~~
 NOTE: pay particular attention to ‘no’ backslash at the end of ldap address, anr the -D value must have backslash in it, in addition in the example domain: return.local, try return.local\user OR return\user
+
+### Password Cracking
+#### Hashcat
+
+|Hash Mode | Hash name | Notes | Example |
+|----------|---------|----------|----------|
+|18200	|Kerberos 5, etype 23, AS-RE| example: getnpusers output hash format |hashcat.exe -m 18200 $krb5asrep$23$svcaccount@sys.local:asdfasdfasdf [snip] rockyou.txt
+|1000| NTLM | SAM and SYSTEM dump file hash format|hashcat -m 1000 --force a9fdfa038c4b75ebc76dc855dd74f0da /usr/share/wordlists/rockyou.txt|
+| 5600 | NetNTLMv2 | example: hash collected from responder or smb login |hashcat --force -a 0 -m 5600 SMBv2-NTLMv2-SSP-10.10.10.125.txt /usr/share/wordlists/rockyou.txt |
+|1800|sha512crypt $6$, SHA512 (Unix) 2|common linux shadow file. the hash will start with $6$| hashcat -m 1800 -a 0 -o password.txt hash rockyou.txt|
+
+#### John the Ripper
+John will often guess the hash format, but you can also supply it if needed
+Examples:
+~~~
+john -format=md5crypt-long --wordlist=rockyou.txt hash.txt
+john -w=rockyou.txt hash.txt
+~~~
+John can crack linux shadow passwords after it has been unshadowed:
+~~~
+ unshadow passwd.txt shadow.txt
+ john -w=rockyou.txt unshadowed_pws.txt
+ ~~~
